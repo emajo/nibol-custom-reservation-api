@@ -64,12 +64,12 @@ exports.update = (req, res) => {
   User.update(req.body, {
     where: { email: req.user }
   })
-    .then(() => {
-      res.send({ success: true })
+  .then(() => {
+    res.send({ success: true })
+  })
+  .catch(err => {
+    res.status(500).send({
+      message: "Error updating the User"
     })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error updating the User"
-      })
-    })
+  })
 }

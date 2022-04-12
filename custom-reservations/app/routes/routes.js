@@ -11,6 +11,7 @@ module.exports = app => {
   router.get("/colleagues", authMiddleware, colleagues.list);
 
   router.get("/reservations", authMiddleware, reservations.list);
+  router.post("/reservations", authMiddleware, reservations.create);
 
   router.get("/login", authentication.login);
   router.get("/auth", authentication.auth);
