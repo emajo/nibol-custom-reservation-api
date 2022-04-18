@@ -23,8 +23,9 @@ exports.auth = (req, res) => {
                   //   {where: {email: queryRes.email}}
                   // )
                   // .then(updatedRes => {
-                  //   res.send(updatedRes)
+                    res.send(authHelper.generateJwt(queryRes.email))
                   // })
+
                 }
                 else {
                   User.create({

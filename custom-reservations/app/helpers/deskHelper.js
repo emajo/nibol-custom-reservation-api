@@ -1,4 +1,3 @@
-const spaceHelper = require('./spaceHelper')
 const axios = require('axios');
 
 module.exports = async function getDeskCodeFromName(space, day, deskName, headers) {
