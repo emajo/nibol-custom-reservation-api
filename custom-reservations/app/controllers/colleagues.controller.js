@@ -17,11 +17,12 @@ exports.list = async (req, res) => {
         r.data.map(function (station) {
           station?.reservation_slots.forEach(function (reservation_slot) {
             if (reservation_slot?.user?.name) {
-              colleaguesInOffice.push(reservation_slot.user.name)
+              colleaguesInOffice.push({name: reservation_slot.user.name, picture: reservation_slot.user.pic})
             }
           })
         })
-        res.send({ collegues: colleaguesInOffice })
+        colleaguesInOffice.sort((a, b) => a.name.localeCompare(b.name))
+        res.send({ colleagues: colleaguesInOffice })
       })
       .catch(error => {
         res.status(500).send({
