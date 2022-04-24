@@ -1,6 +1,6 @@
 {
   "name": "nibol-custom-reservations-be",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Custom Reservations For Nibol",
   "main": "server.js",
   "scripts": {

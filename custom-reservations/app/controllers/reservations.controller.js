@@ -14,7 +14,10 @@ exports.list = async (req, res) => {
       .then(function (r) {
         var reservations = {}
         r.data.map(function (reservation) {
-          if (reservation?.status != "cancelled") {
+
+          var startDate = reservation?.start.split('T')[0]
+
+          if (reservation?.status != "cancelled" && (startDate >= req.query.start && startDate <= req.query.end)) {
 
             var rv = {
               start: reservation.start,

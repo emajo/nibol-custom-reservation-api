@@ -15,6 +15,8 @@ module.exports = app => {
 
   router.get("/login", authentication.login);
   router.get("/auth", authentication.auth);
+
+  router.get("/user", authMiddleware, authentication.get);
   router.put("/user", authMiddleware, authentication.update);
 
   router.post("/nibol_token", authMiddleware, nibolAuthentication.setNibolToken);
