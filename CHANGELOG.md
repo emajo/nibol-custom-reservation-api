@@ -1,8 +1,6 @@
 # Change Log
 
 ## [1.0.1] - 2022-04-24
-  
-Here we would have the update steps for 1.2.4 for people to follow.
  
 ### Added
 
