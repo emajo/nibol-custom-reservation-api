@@ -41,9 +41,8 @@ module.exports = async function getFirstAvailablePlace(space, day, launchSlot, h
       }
 
     }
-    return spaceId
-
+    z++
   }
-
+  return spaceId
 }
 
