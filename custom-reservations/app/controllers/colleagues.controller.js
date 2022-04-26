@@ -8,33 +8,24 @@ const FIC_SPACES = ['dev', 'cs', 'fix']
 exports.list = async (req, res) => {
   try {
     const { days, space } = req.query
+    const headers = await nibolAuthHeadersHelper(req.user)
 
-    var colleagues = []
-    var headers = await nibolAuthHeadersHelper(req.user)
-
-    await Promise.all(
-      days.split(',').map(async day => {
-        if (space === 'all')
-          await Promise.all(FIC_SPACES.map(async s => {
-            return colleagues.push({
-              date: day,
-              reservation: {
-                space: s,
-                colleagues: await listColleagues(s, day, headers)
-              }
-            })
+    let info = []
+    await Promise.all(days.split(',').map(async day => info.push({
+      date: day,
+      reservation: space === 'all'
+        ? await Promise.all(
+          FIC_SPACES.map(async s => ({
+            space: s,
+            colleagues: await listColleagues(s, day, headers)
           }))
-        else
-          colleagues.push({
-            date: day,
-            reservation: {
-              space,
-              colleagues: await listColleagues(space, day, headers)
-            }
-          })
-      })
-    )
-    res.send({ colleagues })
+        )
+        : {
+          space,
+          colleagues: await listColleagues(space, day, headers)
+        }
+    })))
+    res.send({ info })
   } catch ({ message }) {
     res.status(500).send({ message: message ?? "Some error occurred." });
   };
