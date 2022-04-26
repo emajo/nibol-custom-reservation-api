@@ -43,7 +43,7 @@ async function listColleagues(space, day, headers, myId) {
 
     response.data.map(({ reservation_slots }) => {
       reservation_slots.forEach(function (reservation_slot) {
-        if (reservation_slot?.user?.id && reservation_slot?.user?.id != myId) {
+        if (reservation_slot?.user?.id && reservation_slot?.user?.id != myId.nibol_id) {
           colleaguesInOffice.push({ name: reservation_slot.user.name, picture: reservation_slot.user.pic })
         }
       })
