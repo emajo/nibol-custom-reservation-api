@@ -9,29 +9,16 @@ exports.list = async (req, res) => {
   try {
     const { days, space } = req.query
 
-    var colleagues = []
+    var colleagues = {}
     var headers = await nibolAuthHeadersHelper(req.user)
 
     await Promise.all(
       days.split(',').map(async day => {
+        colleagues[day] = {}
         if (space === 'all')
-          await Promise.all(FIC_SPACES.map(async s => {
-            return colleagues.push({
-              date: day,
-              reservation: {
-                space: s,
-                colleagues: await listColleagues(s, day, headers)
-              }
-            })
-          }))
+          await Promise.all(FIC_SPACES.map(async s => colleagues[day][s] = await listColleagues(s, day, headers)))
         else
-          colleagues.push({
-            date: day,
-            reservation: {
-              space,
-              colleagues: await listColleagues(space, day, headers)
-            }
-          })
+          colleagues[day] = await listColleagues(req.query.space, day, headers)
       })
     )
     res.send({ colleagues })
