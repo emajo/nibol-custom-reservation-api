@@ -18,9 +18,9 @@ module.exports = (sequelize, Sequelize) => {
     nibol_token: {
       type: Sequelize.TEXT
     },
-    auth_token: {
-      type: Sequelize.STRING
-    },
+    nibol_id: {
+      type: Sequelize.TEXT
+    }
   });
 
   return User;

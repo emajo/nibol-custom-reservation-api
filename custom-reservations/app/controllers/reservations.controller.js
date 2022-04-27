@@ -10,10 +10,15 @@ const User = db.users;
 exports.list = async (req, res) => {
 
   try {
+<<<<<<< HEAD
     axios.get(`${process.env.NIBOL_URL}/reservation/calendar`, await nibolAuthHeadersHelper(req.user))
       .then(function (r) {
+=======
+    axios.get('https://api.nibol.co/v2/app/business/reservation/calendar', await nibolAuthHeadersHelper(req.user))
+      .then(r => {
+>>>>>>> main
         var reservations = {}
-        r.data.map(function (reservation) {
+        r.data.map(reservation => {
 
           var startDate = reservation?.start.split('T')[0]
 
@@ -36,7 +41,7 @@ exports.list = async (req, res) => {
         })
         res.send({ reservations: reservations })
       })
-      .catch(function (error) {
+      .catch(error => {
         res.status(500).send({
           message:
             error.message || "Some error occurred."

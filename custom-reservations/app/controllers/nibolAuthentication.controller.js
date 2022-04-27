@@ -1,4 +1,5 @@
 const axios = require('axios')
+const userHelper = require('../helpers/userHelper')
 const db = require("../models");
 const User = db.users;
 
@@ -54,7 +55,10 @@ async function saveNibolToken(token, mail) {
     res = await axios.get(`${process.env.NIBOL_URL}/company/info`, { headers: { 'Authorization': 'Bearer ' + token } })
     if (res.status == 200) {
       await User.update(
-        { nibol_token: token },
+        {
+          nibol_token: token,
+          nibol_id: await userHelper({ headers: { 'Authorization': 'Bearer ' + token } }, 'id')
+        },
         { where: { email: mail } }
       )
     }
