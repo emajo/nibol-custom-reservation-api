@@ -30,7 +30,7 @@ exports.list = async (req, res) => {
 async function getSpace(space, day, headers, myId) {
   return {
     space,
-    colleagues: await listColleagues(s, day, headers, myId)
+    colleagues: await listColleagues(space, day, headers, myId)
   }
 }
 
