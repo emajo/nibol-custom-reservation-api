@@ -6,11 +6,11 @@ const User = db.users;
 
 const FIC_SPACES = ['dev', 'cs', 'fix']
 
-exports.list = async ({ query, user }, res) => {
+exports.list = async (req, res) => {
   try {
-    const { days, space } = query
-    const headers = await nibolAuthHeadersHelper(user)
-    const myId = await User.findOne({ attributes: ['nibol_id'], where: { email: user }, raw: true })
+    const { days, space } = req.query
+    const headers = await nibolAuthHeadersHelper(req.user)
+    const myId = await User.findOne({ attributes: ['nibol_id'], where: { email: req.user }, raw: true })
 
     let info = []
     await Promise.all(days.split(',').map(async day =>
@@ -22,8 +22,8 @@ exports.list = async ({ query, user }, res) => {
       })
     ))
     res.send({ info })
-  } catch ({ message }) {
-    res.status(500).send({ message: message ?? "Some error occurred." });
+  } catch (e) {
+    res.status(500).send({ message: e.message ?? "Some error occurred." });
   };
 }
 
@@ -51,7 +51,7 @@ async function listColleagues(space, day, headers, myId) {
       }))
 
     return colleagues.sort((a, b) => a.name.localeCompare(b.name))
-  } catch ({ message }) {
-    throw Error(message ?? "Some error occurred.")
+  } catch (e) {
+    throw Error(e.message ?? "Some error occurred.")
   }
 }
