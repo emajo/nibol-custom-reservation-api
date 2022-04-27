@@ -5,30 +5,31 @@ const axios = require('axios')
 
 const FIC_SPACES = ['dev', 'cs', 'fix']
 
-exports.list = async (req, res) => {
+exports.list = async ({ query, user }, res) => {
   try {
-    const { days, space } = req.query
-    const headers = await nibolAuthHeadersHelper(req.user)
+    const { days, space } = query
+    const headers = await nibolAuthHeadersHelper(user)
 
     let info = []
-    await Promise.all(days.split(',').map(async day => info.push({
-      date: day,
-      reservation: space === 'all'
-        ? await Promise.all(
-          FIC_SPACES.map(async s => ({
-            space: s,
-            colleagues: await listColleagues(s, day, headers)
-          }))
-        )
-        : {
-          space,
-          colleagues: await listColleagues(space, day, headers)
-        }
-    })))
+    await Promise.all(days.split(',').map(async day =>
+      info.push({
+        date: day,
+        reservation: space === 'all'
+          ? await Promise.all(FIC_SPACES.map(async s => getSpace(s, day, headers)))
+          : getSpace(space, day, headers)
+      })
+    ))
     res.send({ info })
   } catch ({ message }) {
     res.status(500).send({ message: message ?? "Some error occurred." });
   };
+}
+
+async function getSpace(space, day, headers) {
+  return {
+    space,
+    colleagues: await listColleagues(s, day, headers)
+  }
 }
 
 async function listColleagues(space, day, headers) {
@@ -38,17 +39,15 @@ async function listColleagues(space, day, headers) {
   }).toString();
 
   try {
-    var response = await axios.get(`https://api.nibol.co/v2/app/business/space/days-availability/map?${query}`, headers)
+    const response = await axios.get(`${process.env.NIBOL_URL}/space/days-availability/map?${query}`, headers)
 
-    colleaguesInOffice = []
+    colleagues = []
+    response.data.map(({ reservation_slots }) =>
+      reservation_slots.map(({ user: { name, pic } }) =>
+        colleagues.push({ name, pic })
+      ))
 
-    response.data.map(({ reservation_slots }) => {
-      reservation_slots.forEach(({ user: { name, pic: picture } }) => {
-        colleaguesInOffice.push({ name, picture })
-      })
-    })
-
-    return colleaguesInOffice.sort((a, b) => a.name.localeCompare(b.name))
+    return colleagues.sort((a, b) => a.name.localeCompare(b.name))
   } catch ({ message }) {
     throw Error(message ?? "Some error occurred.")
   }

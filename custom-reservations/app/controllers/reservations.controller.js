@@ -10,7 +10,7 @@ const User = db.users;
 exports.list = async (req, res) => {
 
   try {
-    axios.get('https://api.nibol.co/v2/app/business/reservation/calendar', await nibolAuthHeadersHelper(req.user))
+    axios.get(`${process.env.NIBOL_URL}/reservation/calendar`, await nibolAuthHeadersHelper(req.user))
       .then(function (r) {
         var reservations = {}
         r.data.map(function (reservation) {
@@ -81,7 +81,7 @@ exports.create = async (req, res) => {
         }
       }
 
-      axios.post('https://api.nibol.co/v2/app/business/reservation/' + type + '/create', reqBody, headers)
+      axios.post(`${process.env.NIBOL_URL}/reservation/${type}/create`, reqBody, headers)
         .then(result => {
           if (result.status == 200) {
             res.send({ success: true })

@@ -9,7 +9,7 @@ module.exports = async function getDeskCodeFromName(space, day, deskName, header
 
   query = new URLSearchParams(queryParams).toString();
 
-  var r = await axios.get('https://api.nibol.co/v2/app/business/space/days-availability/map' + '?' + query, headers)
+  var r = await axios.get(`${process.env.NIBOL_URL}/space/days-availability/map?${query}`, headers)
   var deskComponents = deskName.split('.')
   var deskIndex = deskComponents[deskComponents.length - 1]
   var deskId = r.data[parseInt(deskIndex)].id
