@@ -10,7 +10,7 @@ module.exports = async function getFirstAvailablePlace(space, day, launchSlot, h
 
   query = new URLSearchParams(queryParams).toString();
 
-  var r = await axios.get('https://api.nibol.co/v2/app/business/space/days-availability/map' + '?' + query, headers)
+  var r = await axios.get(`${process.env.NIBOL_URL}/space/days-availability/map?${query}`, headers)
 
   var z = 0
   while (z < r.data.length && find != true) {
@@ -45,4 +45,3 @@ module.exports = async function getFirstAvailablePlace(space, day, launchSlot, h
   }
   return spaceId
 }
-

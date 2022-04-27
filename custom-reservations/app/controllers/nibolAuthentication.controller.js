@@ -52,7 +52,7 @@ async function saveNibolToken(token, mail) {
 
   try {
 
-    res = await axios.get('https://api.nibol.co/v2/app/business/company/info', { headers: { 'Authorization': 'Bearer ' + token } })
+    res = await axios.get(`${process.env.NIBOL_URL}/company/info`, { headers: { 'Authorization': 'Bearer ' + token } })
     if (res.status == 200) {
       await User.update(
         {

@@ -9,25 +9,29 @@ const FIC_SPACES = ['dev', 'cs', 'fix']
 exports.list = async (req, res) => {
   try {
     const { days, space } = req.query
+    const headers = await nibolAuthHeadersHelper(req.user)
+    const myId = await User.findOne({ attributes: ['nibol_id'], where: { email: req.user }, raw: true })
 
-    var myId = await User.findOne({ attributes: ['nibol_id'], where: { email: req.user }, raw: true })
-
-    var colleagues = {}
-    var headers = await nibolAuthHeadersHelper(req.user)
-
-    await Promise.all(
-      days.split(',').map(async day => {
-        colleagues[day] = {}
-        if (space === 'all')
-          await Promise.all(FIC_SPACES.map(async s => colleagues[day][s] = await listColleagues(s, day, headers, myId)))
-        else
-          colleagues[day] = await listColleagues(req.query.space, day, headers, myId)
+    let info = []
+    await Promise.all(days.split(',').map(async day =>
+      info.push({
+        date: day,
+        reservation: space === 'all'
+          ? await Promise.all(FIC_SPACES.map(async s => getSpace(s, day, headers, myId)))
+          : getSpace(space, day, headers)
       })
-    )
-    res.send({ colleagues })
+    ))
+    res.send({ info })
   } catch (e) {
     res.status(500).send({ message: e.message ?? "Some error occurred." });
   };
+}
+
+async function getSpace(space, day, headers, myId) {
+  return {
+    space,
+    colleagues: await listColleagues(space, day, headers, myId)
+  }
 }
 
 async function listColleagues(space, day, headers, myId) {
@@ -37,19 +41,16 @@ async function listColleagues(space, day, headers, myId) {
   }).toString();
 
   try {
-    var response = await axios.get(`https://api.nibol.co/v2/app/business/space/days-availability/map?${query}`, headers)
+    const response = await axios.get(`${process.env.NIBOL_URL}/space/days-availability/map?${query}`, headers)
 
-    colleaguesInOffice = []
+    colleagues = []
+    response.data.map(({ reservation_slots }) =>
+      reservation_slots.map(({ user: { id, name, pic } }) => {
+        if (!!name && !!id && id !== myId.nibol_id)
+          colleagues.push({ name, pic })
+      }))
 
-    response.data.map(({ reservation_slots }) => {
-      reservation_slots.forEach(function (reservation_slot) {
-        if (reservation_slot?.user?.id && reservation_slot?.user?.id != myId.nibol_id) {
-          colleaguesInOffice.push({ name: reservation_slot.user.name, picture: reservation_slot.user.pic })
-        }
-      })
-    })
-
-    return colleaguesInOffice.sort((a, b) => a.name.localeCompare(b.name))
+    return colleagues.sort((a, b) => a.name.localeCompare(b.name))
   } catch (e) {
     throw Error(e.message ?? "Some error occurred.")
   }
