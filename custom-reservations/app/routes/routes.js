@@ -1,10 +1,10 @@
 module.exports = app => {
   const authMiddleware = require("../middleware/auth.middleware.js")
 
-  const authentication = require("../controllers/authentication/controller.js")
-  const colleagues = require("../controllers/colleagues/controller.js")
-  const nibolAuthentication = require("../controllers/nibolAuthentication/controller.js")
-  const reservations = require("../controllers/reservations/controller.js")
+  const authentication = require("../controllers/authentication.controller.js")
+  const colleagues = require("../controllers/colleagues.controller.js")
+  const nibolAuthentication = require("../controllers/nibolAuthentication.controller.js")
+  const reservations = require("../controllers/reservations.controller.js")
 
   const router = require("express").Router()
 

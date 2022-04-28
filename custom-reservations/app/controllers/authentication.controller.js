@@ -1,9 +1,9 @@
-const nibolAuthHeadersHelper = require("../../helpers/nibolAuthHeadersHelper");
-const userHelper = require("../../helpers/userHelper");
-const db = require("../../models");
+const nibolAuthHeadersHelper = require("../helpers/nibolAuthHeadersHelper");
+const userHelper = require("../helpers/userHelper");
+const db = require("../models");
 const User = db.users;
 
-const authHelper = require('../../helpers/authHelper')
+const authHelper = require('../helpers/authHelper')
 exports.login = (req, res) => {
 
   res.redirect(authHelper.buildRedirectUri())

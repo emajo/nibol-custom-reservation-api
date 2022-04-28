@@ -1,7 +1,7 @@
-const spaceHelper = require('../../helpers/spaceHelper')
-const nibolAuthHeadersHelper = require('../../helpers/nibolAuthHeadersHelper');
+const spaceHelper = require('../helpers/spaceHelper')
+const nibolAuthHeadersHelper = require('../helpers/nibolAuthHeadersHelper');
 const axios = require('axios')
-const db = require("../../models");
+const db = require("../models");
 const User = db.users;
 
 const FIC_SPACES = ['dev', 'cs', 'fix']

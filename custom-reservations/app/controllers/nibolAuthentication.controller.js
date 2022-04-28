@@ -1,6 +1,6 @@
 const axios = require('axios')
-const userHelper = require('../../helpers/userHelper')
-const db = require("../../models");
+const userHelper = require('../helpers/userHelper')
+const db = require("../models");
 const User = db.users;
 
 exports.setNibolToken = (req, res) => {

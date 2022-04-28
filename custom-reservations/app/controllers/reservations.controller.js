@@ -1,12 +1,22 @@
-const nibolAuthHeadersHelper = require('../../helpers/nibolAuthHeadersHelper');
-const spaceHelper = require('../../helpers/spaceHelper');
-const getDeskCodeFromName = require('../../helpers/deskHelper');
-const getFirstAvailablePlace = require('../../helpers/parkingHelper');
-const getLaunchEndTime = require('../../helpers/launchTimeHelper');
+const nibolAuthHeadersHelper = require('../helpers/nibolAuthHeadersHelper');
+const spaceHelper = require('../helpers/spaceHelper');
+const getDeskCodeFromName = require('../helpers/deskHelper');
+const getFirstAvailablePlace = require('../helpers/parkingHelper');
+const getLaunchEndTime = require('../helpers/launchTimeHelper');
 const axios = require('axios');
-const db = require("../../models");
-const { getResponseDate, getResponseReservation, alreadyExist } = require('./_utils');
+const db = require("../models");
 const User = db.users;
+
+const alreadyExist = (reservations, date) => !!reservations?.find(reservation => reservation.date === date)
+
+const getResponseDate = (response) => response?.start.split('T')[0]
+
+const getResponseReservation = (response) => ({
+  start: response.start,
+  end: response.end,
+  space: response.space.name,
+})
+
 
 exports.list = async (req, res) => {
   let info = []
