@@ -20,6 +20,7 @@ exports.list = async (req, res) => {
           if (reservation?.status != "cancelled" && (startDate >= req.query.start && startDate <= req.query.end)) {
 
             var rv = {
+              id: reservation.id,
               start: reservation.start,
               end: reservation.end,
               space: reservation.space.name
@@ -105,4 +106,30 @@ exports.create = async (req, res) => {
           err.message || "Some error occurred."
       });
     });
+}
+
+exports.delete = async (req, res) => {
+
+  var type;
+  if (req.body.type == "desk") type = "desk"
+  else if (req.body.type == "launch") type = "parking"
+  else res.status(500).send({
+    message:
+      "Invalid type."
+  })
+  axios.post(`${process.env.NIBOL_URL}/reservation/${type}/cancel`, {reservation_id: req.body.reservation_id}, await nibolAuthHeadersHelper(req.user))
+    .then(result => {
+      if (result.status == 200) {
+        res.send({ success: true })
+      } else {
+        throw new Error("Could not cancel a reservation.")
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Could not cancel a reservation."
+      })
+    });
+
 }
