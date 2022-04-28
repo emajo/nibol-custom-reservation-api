@@ -1,26 +1,26 @@
 module.exports = app => {
-  const colleagues = require("../controllers/colleagues.controller.js");
-  const reservations = require("../controllers/reservations.controller.js");
-  const authentication = require("../controllers/authentication.controller.js");
-  const nibolAuthentication = require("../controllers/nibolAuthentication.controller.js");
-  const authMiddleware = require("../middleware/auth.middleware.js");
+  const authMiddleware = require("../middleware/auth.middleware.js")
 
-  var router = require("express").Router();
+  const authentication = require("../controllers/authentication/controller.js")
+  const colleagues = require("../controllers/colleagues/controller.js")
+  const nibolAuthentication = require("../controllers/nibolAuthentication/controller.js")
+  const reservations = require("../controllers/reservations/controller.js")
 
-  // List colleagues in office
-  router.get("/colleagues", authMiddleware, colleagues.list);
+  const router = require("express").Router()
 
-  router.get("/reservations", authMiddleware, reservations.list);
-  router.post("/reservations", authMiddleware, reservations.create);
+  router.get("/colleagues", authMiddleware, colleagues.list)
 
-  router.get("/login", authentication.login);
-  router.get("/auth", authentication.auth);
+  router.get("/reservations", authMiddleware, reservations.list)
+  router.post("/reservations", authMiddleware, reservations.create)
 
-  router.get("/user", authMiddleware, authentication.get);
-  router.put("/user", authMiddleware, authentication.update);
+  router.get("/login", authentication.login)
+  router.get("/auth", authentication.auth)
 
-  router.post("/nibol_token", authMiddleware, nibolAuthentication.setNibolToken);
-  router.post("/nibol_pass", authMiddleware, nibolAuthentication.retireveNibolTokenFromPassword);
+  router.get("/user", authMiddleware, authentication.get)
+  router.put("/user", authMiddleware, authentication.update)
 
-  app.use('/api', router);
+  router.post("/nibol_token", authMiddleware, nibolAuthentication.setNibolToken)
+  router.post("/nibol_pass", authMiddleware, nibolAuthentication.retireveNibolTokenFromPassword)
+
+  app.use('/api', router)
 };

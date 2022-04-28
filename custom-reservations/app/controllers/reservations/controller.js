@@ -1,55 +1,46 @@
-const nibolAuthHeadersHelper = require('../helpers/nibolAuthHeadersHelper');
-const spaceHelper = require('../helpers/spaceHelper');
-const getDeskCodeFromName = require('../helpers/deskHelper');
-const getFirstAvailablePlace = require('../helpers/parkingHelper');
-const getLaunchEndTime = require('../helpers/launchTimeHelper');
+const nibolAuthHeadersHelper = require('../../helpers/nibolAuthHeadersHelper');
+const spaceHelper = require('../../helpers/spaceHelper');
+const getDeskCodeFromName = require('../../helpers/deskHelper');
+const getFirstAvailablePlace = require('../../helpers/parkingHelper');
+const getLaunchEndTime = require('../../helpers/launchTimeHelper');
 const axios = require('axios');
-const db = require("../models");
+const db = require("../../models");
+const { getResponseDate, getResponseReservation, alreadyExist } = require('./_utils');
 const User = db.users;
 
 exports.list = async (req, res) => {
+  let info = []
 
   try {
-    axios.get(`${process.env.NIBOL_URL}/reservation/calendar`, await nibolAuthHeadersHelper(req.user))
-      .then(function (r) {
-        var reservations = {}
-        r.data.map(reservation => {
+    axios.get(
+      `${process.env.NIBOL_URL}/reservation/calendar`,
+      await nibolAuthHeadersHelper(req.user)
+    ).then(responses => {
+      responses.data.map(response => {
+        if (response?.status === 'cancelled')
+          return
 
-          var startDate = reservation?.start.split('T')[0]
+        const date = getResponseDate(response)
+        if (date < req.query.start || date > req.query.end)
+          return
 
-          if (reservation?.status != "cancelled" && (startDate >= req.query.start && startDate <= req.query.end)) {
-
-            var rv = {
-              start: reservation.start,
-              end: reservation.end,
-              space: reservation.space.name
-            }
-
-            var day = rv.start.split("T")[0]
-
-            if ([day] in reservations) {
-              reservations[day].push(rv)
-            } else {
-              reservations[day] = [rv]
-            }
-          }
-        })
-        res.send({ reservations: reservations })
+        !!alreadyExist(info, date)
+          ? info.map(item => item.date === date
+            ? item.reservations.push({ ...getResponseReservation(response) })
+            : item
+          )
+          : info.push({ date, reservations: [{ ...getResponseReservation(response) }] })
       })
-      .catch(error => {
-        res.status(500).send({
-          message:
-            error.message || "Some error occurred."
-        });
-      })
+      res.send({ info })
+    }).catch(
+      error => res.status(500).send({ message: error.message || "Some error occurred." })
+    )
   } catch (e) {
     res.status(500).send({
-      message:
-        e.message || "Some error occurred."
-    });
+      message: e.message || "Some error occurred."
+    })
   }
-
-};
+}
 
 exports.create = async (req, res) => {
 

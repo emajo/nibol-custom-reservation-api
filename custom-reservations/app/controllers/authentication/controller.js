@@ -1,9 +1,9 @@
-const nibolAuthHeadersHelper = require("../helpers/nibolAuthHeadersHelper");
-const userHelper = require("../helpers/userHelper");
-const db = require("../models");
+const nibolAuthHeadersHelper = require("../../helpers/nibolAuthHeadersHelper");
+const userHelper = require("../../helpers/userHelper");
+const db = require("../../models");
 const User = db.users;
 
-const authHelper = require('./../helpers/authHelper')
+const authHelper = require('../../helpers/authHelper')
 exports.login = (req, res) => {
 
   res.redirect(authHelper.buildRedirectUri())
@@ -25,7 +25,7 @@ exports.auth = (req, res) => {
                   //   {where: {email: queryRes.email}}
                   // )
                   // .then(updatedRes => {
-                    res.send(authHelper.generateJwt(queryRes.email))
+                  res.send(authHelper.generateJwt(queryRes.email))
                   // })
 
                 }
@@ -67,20 +67,20 @@ exports.update = (req, res) => {
   User.update(req.body, {
     where: { email: req.user }
   })
-  .then(() => {
-    res.send({ success: true })
-  })
-  .catch(err => {
-    res.status(500).send({
-      message: "Error updating the User"
+    .then(() => {
+      res.send({ success: true })
     })
-  })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating the User"
+      })
+    })
 }
 
 exports.get = (req, res) => {
   User.findOne({ attributes: ['name', 'role', 'default_desk', 'launch_slot'], where: { email: req.user }, raw: true })
-  .then(async queryRes => {
-    queryRes.pic = await userHelper(await nibolAuthHeadersHelper(req.user), 'pic')
-    res.send(queryRes)
-  })
+    .then(async queryRes => {
+      queryRes.pic = await userHelper(await nibolAuthHeadersHelper(req.user), 'pic')
+      res.send(queryRes)
+    })
 }
