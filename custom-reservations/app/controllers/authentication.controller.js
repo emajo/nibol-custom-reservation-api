@@ -19,13 +19,15 @@ exports.auth = (req, res) => {
           .then(userInfo => {
             User.findOne({ where: { email: userInfo.email } })
               .then(queryRes => {
+                var userExists = true
                 if (!queryRes) {
                   User.create({
                     name: userInfo.name,
                     email: userInfo.email
                   })
+                  userExists = false
                 }
-                res.redirect(`${process.env.APP_URL}/login?token=${authHelper.generateJwt(userInfo.email)}`)
+                res.redirect(`${process.env.APP_URL}/login?token=${authHelper.generateJwt(userInfo.email)}&exists=${userExists}`)
               })
               .catch(err => {
                 res.status(500).send({
