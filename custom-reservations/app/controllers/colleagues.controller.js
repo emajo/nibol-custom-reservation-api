@@ -8,7 +8,8 @@ const FIC_SPACES = ['dev', 'cs', 'fix']
 
 exports.list = async (req, res) => {
   try {
-    const { days, space } = req.query
+    const { days, space, sort } = req.query
+    console.log(sort)
     const headers = await nibolAuthHeadersHelper(req.user)
     const myId = await User.findOne({ attributes: ['nibol_id'], where: { email: req.user }, raw: true })
 
