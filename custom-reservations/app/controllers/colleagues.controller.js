@@ -22,6 +22,7 @@ exports.list = async (req, res) => {
           : getSpace(space, day, headers)
       })
     ))
+    info.sort((a, b) => a.date > b.date ? 1 : -1)
     res.send({ info })
   } catch (e) {
     res.status(500).send({ message: e.message ?? "Some error occurred." });
