@@ -19,7 +19,7 @@ exports.list = async (req, res) => {
         date: day,
         reservation: space === 'all'
           ? await Promise.all(FIC_SPACES.map(async s => getSpace(s, day, headers, myId)))
-          : getSpace(space, day, headers)
+          : await getSpace(space, day, headers, myId)
       })
     ))
     info.sort((a, b) => a.date > b.date ? 1 : -1)
