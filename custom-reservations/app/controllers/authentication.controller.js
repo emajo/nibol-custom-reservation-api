@@ -19,26 +19,15 @@ exports.auth = (req, res) => {
           .then(userInfo => {
             User.findOne({ where: { email: userInfo.email } })
               .then(queryRes => {
-                if (queryRes) {
-                  // queryRes.update(
-                  //   //{auth_token: authHelper.generateJwt(queryRes.email)},
-                  //   {where: {email: queryRes.email}}
-                  // )
-                  // .then(updatedRes => {
-                    res.send(authHelper.generateJwt(queryRes.email))
-                  // })
-
-                }
-                else {
+                var userExists = true
+                if (!queryRes) {
                   User.create({
                     name: userInfo.name,
-                    email: userInfo.email,
-                    //auth_token: authHelper.generateJwt(userInfo.email)
+                    email: userInfo.email
                   })
-                    .then(newUsr => {
-                      res.send(authHelper.generateJwt(userInfo.email))
-                    });
+                  userExists = false
                 }
+                res.redirect(`${process.env.APP_URL}/login?token=${authHelper.generateJwt(userInfo.email)}&exists=${userExists}`)
               })
               .catch(err => {
                 res.status(500).send({
@@ -67,20 +56,20 @@ exports.update = (req, res) => {
   User.update(req.body, {
     where: { email: req.user }
   })
-  .then(() => {
-    res.send({ success: true })
-  })
-  .catch(err => {
-    res.status(500).send({
-      message: "Error updating the User"
+    .then(() => {
+      res.send({ success: true })
     })
-  })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating the User"
+      })
+    })
 }
 
 exports.get = (req, res) => {
   User.findOne({ attributes: ['name', 'role', 'default_desk', 'launch_slot'], where: { email: req.user }, raw: true })
-  .then(async queryRes => {
-    queryRes.pic = await userHelper(await nibolAuthHeadersHelper(req.user), 'pic')
-    res.send(queryRes)
-  })
+    .then(async queryRes => {
+      queryRes.pic = await userHelper(await nibolAuthHeadersHelper(req.user), 'pic')
+      res.send(queryRes)
+    })
 }
