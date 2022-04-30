@@ -8,7 +8,7 @@ const FIC_SPACES = ['dev', 'cs', 'fix']
 
 exports.list = async (req, res) => {
   try {
-    const { days, space } = req.query
+    const { days, space, sort } = req.query
     const headers = await nibolAuthHeadersHelper(req.user)
     const myId = await User.findOne({ attributes: ['nibol_id'], where: { email: req.user }, raw: true })
 
@@ -21,6 +21,7 @@ exports.list = async (req, res) => {
           : getSpace(space, day, headers, myId)
       })
     ))
+    if (sort) info.sort((a, b) => a.date > b.date ? 1 : -1)
     res.send({ info })
   } catch (e) {
     res.status(500).send({ message: e.message ?? "Some error occurred." });
