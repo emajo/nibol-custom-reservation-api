@@ -7,6 +7,8 @@ const axios = require('axios');
 const db = require("../models");
 const User = db.users;
 
+const dateAlreadyExists = (reservations, date) => !!reservations?.find(reservation => reservation.date === date)
+
 exports.list = async (req, res) => {
 
   try {
@@ -19,8 +21,8 @@ exports.list = async (req, res) => {
     }
 
     axios.get(`${process.env.NIBOL_URL}/reservation/calendar`, await nibolAuthHeadersHelper(req.user))
-      .then(function (r) {
-        var reservations = {}
+      .then(r => {
+        var days = []
         r.data.map(reservation => {
 
           var startDate = reservation?.start.split('T')[0]
@@ -37,14 +39,21 @@ exports.list = async (req, res) => {
 
             var day = rv.start.split("T")[0]
 
-            if ([day] in reservations) {
-              reservations[day].push(rv)
+            if (dateAlreadyExists(days, day)) {
+              days.map(d => {
+                if (d.date === day) {
+                  d.reservations.push(rv)
+                }
+              })
             } else {
-              reservations[day] = [rv]
+              days.push({
+                date: day,
+                reservations: [rv]
+              })
             }
           }
         })
-        res.send({ reservations: reservations })
+        res.send({ days })
       })
       .catch(error => {
         res.status(500).send({
@@ -126,7 +135,7 @@ exports.delete = async (req, res) => {
     message:
       "Invalid type."
   })
-  axios.post(`${process.env.NIBOL_URL}/reservation/${type}/cancel`, {reservation_id: req.body.reservation_id}, await nibolAuthHeadersHelper(req.user))
+  axios.post(`${process.env.NIBOL_URL}/reservation/${type}/cancel`, { reservation_id: req.body.reservation_id }, await nibolAuthHeadersHelper(req.user))
     .then(result => {
       if (result.status == 200) {
         res.send({ success: true })
