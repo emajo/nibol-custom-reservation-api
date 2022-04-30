@@ -4,7 +4,7 @@ const getDeskCodeFromName = require('../helpers/deskHelper');
 const getFirstAvailablePlace = require('../helpers/parkingHelper');
 const getLaunchEndTime = require('../helpers/launchTimeHelper');
 const axios = require('axios');
-const db = require("../models");
+const db = require('../models');
 const User = db.users;
 
 const dateAlreadyExists = (reservations, date) => !!reservations?.find(reservation => reservation.date === date)
@@ -26,7 +26,7 @@ exports.list = async (req, res) => {
 
           var startDate = reservation?.start.split('T')[0]
 
-          if (reservation?.status != "cancelled" && (startDate >= req.query.start && startDate <= req.query.end)) {
+          if (reservation?.status != 'cancelled' && (startDate >= req.query.start && startDate <= req.query.end)) {
 
             var rv = {
               id: reservation.id,
@@ -35,7 +35,7 @@ exports.list = async (req, res) => {
               space: spaces[reservation.space.name]
             }
 
-            var day = rv.start.split("T")[0]
+            var day = rv.start.split('T')[0]
 
             if (dateAlreadyExists(days, day)) {
               days.map(d => {
@@ -56,13 +56,13 @@ exports.list = async (req, res) => {
       .catch(error => {
         res.status(500).send({
           message:
-            error.message || "Some error occurred."
+            error.message || 'Some error occurred.'
         });
       })
   } catch (e) {
     res.status(500).send({
       message:
-        e.message || "Some error occurred."
+        e.message || 'Some error occurred.'
     });
   }
 
@@ -73,26 +73,28 @@ exports.create = async (req, res) => {
   var headers = await nibolAuthHeadersHelper(req.user)
   User.findOne({ where: { email: req.user } })
     .then(async queryRes => {
-      if (req.body.type == "desk") {
-        var type = "desk"
-        var space = spaceHelper(queryRes.role)
-        var deskCode = await getDeskCodeFromName(space, req.body.day, queryRes.default_desk, headers)
+      if (req.body.type == 'desk') {
+        var type = 'desk'
+
+        var space = spaceHelper(req.body.custom_space || queryRes.role)
+
+        var deskCode = await getDeskCodeFromName(space, req.body.day, req.body.custom_desk || queryRes.default_desk, headers)
 
         var reqBody = {
-          start: req.body.day + "T08:00:00.000Z",
-          end: req.body.day + "T18:00:00.000Z",
+          start: req.body.day + 'T' + (req.body.custom_start || '08:00') + ':00.000Z',
+          end: req.body.day + 'T' + (req.body.custom_end || '18:00') + ':00.000Z',
           desk_id: deskCode,
           space_id: space
         }
 
-      } else if (req.body.type == "launch") {
-        var type = "parking"
-        var space = spaceHelper("mensa")
+      } else if (req.body.type == 'launch') {
+        var type = 'parking'
+        var space = spaceHelper('mensa')
         var deskCode = await getFirstAvailablePlace(space, req.body.day, queryRes.launch_slot, headers)
 
         var reqBody = {
-          start: req.body.day + "T" + queryRes.launch_slot + ":00.000Z",
-          end: req.body.day + "T" + getLaunchEndTime(queryRes.launch_slot) + ":00.000Z",
+          start: req.body.day + 'T' + (req.body.custom_start || queryRes.launch_slot) + ':00.000Z',
+          end: req.body.day + 'T' + getLaunchEndTime(req.body.custom_start || queryRes.launch_slot) + ':00.000Z',
           parking_id: deskCode,
           space_id: space
         }
@@ -105,21 +107,21 @@ exports.create = async (req, res) => {
           } else {
             res.status(500).send({
               message:
-                err.message || "Could not create a reservation."
+                err.message || 'Could not create a reservation.'
             })
           }
         })
         .catch(err => {
           res.status(500).send({
             message:
-              err.message || "Could not create a reservation."
+              err.message || 'Could not create a reservation.'
           })
         });
     })
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred."
+          err.message || 'Some error occurred.'
       });
     });
 }
@@ -127,24 +129,24 @@ exports.create = async (req, res) => {
 exports.delete = async (req, res) => {
 
   var type;
-  if (req.body.type == "desk") type = "desk"
-  else if (req.body.type == "launch") type = "parking"
+  if (req.body.type == 'desk') type = 'desk'
+  else if (req.body.type == 'launch') type = 'parking'
   else res.status(500).send({
     message:
-      "Invalid type."
+      'Invalid type.'
   })
   axios.post(`${process.env.NIBOL_URL}/reservation/${type}/cancel`, { reservation_id: req.body.reservation_id }, await nibolAuthHeadersHelper(req.user))
     .then(result => {
       if (result.status == 200) {
         res.send({ success: true })
       } else {
-        throw new Error("Could not cancel a reservation.")
+        throw new Error('Could not cancel a reservation.')
       }
     })
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Could not cancel a reservation."
+          err.message || 'Could not cancel a reservation.'
       })
     });
 
