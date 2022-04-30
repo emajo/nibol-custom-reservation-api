@@ -9,6 +9,13 @@ const User = db.users;
 
 const dateAlreadyExists = (reservations, date) => !!reservations?.find(reservation => reservation.date === date)
 
+const spaces = {
+  'Open Space Developers': 'dev',
+  'Open Space Customer Support': 'cs',
+  'Postazioni fisse': 'fix',
+  'Sala Mensa ': 'mensa'
+}
+
 exports.list = async (req, res) => {
 
   try {
@@ -25,7 +32,7 @@ exports.list = async (req, res) => {
               id: reservation.id,
               start: reservation.start,
               end: reservation.end,
-              space: reservation.space.name
+              space: spaces[reservation.space.name]
             }
 
             var day = rv.start.split("T")[0]
