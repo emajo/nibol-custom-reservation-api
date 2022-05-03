@@ -1,6 +1,7 @@
 const nibolAuthHeadersHelper = require("../helpers/nibolAuthHeadersHelper");
 const userHelper = require("../helpers/userHelper");
 const db = require("../models");
+const users = require("../services/database");
 const User = db.users;
 
 exports.get = (req, res) => {
@@ -12,5 +13,5 @@ exports.get = (req, res) => {
 }
 
 exports.test = (req, res) => {
-  res.send(req.user);
+  
 }

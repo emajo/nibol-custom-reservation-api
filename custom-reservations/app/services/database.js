@@ -1,4 +1,6 @@
+require('./firebase')
 const { getFirestore } = require('firebase-admin/firestore');
+
 
 const db = getFirestore()
 
@@ -7,3 +9,5 @@ if(process.env.FIRESTORE_EMULATOR_HOST) {
 }
 
 const users = db.collection('users')
+
+module.exports = users
