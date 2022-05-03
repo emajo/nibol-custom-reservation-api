@@ -16,7 +16,6 @@ services:
     image: custom_reservations/node:latest
     depends_on:
       - mysqldb
-    # build: ./custom-reservations
     restart: always
     env_file: ./.env
     ports:

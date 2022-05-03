@@ -2,14 +2,11 @@ const nibolAuthHeadersHelper = require("../helpers/nibolAuthHeadersHelper");
 const userHelper = require("../helpers/userHelper");
 const db = require("../models");
 const User = db.users;
-
 const authHelper = require('./../helpers/authHelper')
+
 exports.login = (req, res) => {
-
   res.redirect(authHelper.buildRedirectUri())
-
 };
-
 
 exports.auth = (req, res) => {
   if (req?.query?.code) {
