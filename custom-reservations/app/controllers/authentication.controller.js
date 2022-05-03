@@ -1,15 +1,13 @@
 const nibolAuthHeadersHelper = require("../helpers/nibolAuthHeadersHelper");
+const gauthHelper = require('./../helpers/gauthHelper')
+const authHelper = require('./../helpers/authHelper')
 const userHelper = require("../helpers/userHelper");
 const db = require("../models");
 const User = db.users;
 
-const authHelper = require('./../helpers/authHelper')
 exports.login = (req, res) => {
-
   res.redirect(authHelper.buildRedirectUri())
-
 };
-
 
 exports.auth = (req, res) => {
   if (req?.query?.code) {
@@ -47,6 +45,37 @@ exports.auth = (req, res) => {
   else {
     res.redirect(process.env.URL + '/api/login')
   }
+}
+
+exports.glogin = (req, res) => {
+  var tokenId = req.body.token_id;
+  gauthHelper.verify(tokenId)
+    .then(userInfo => {
+      User.findOne({ where: { email: userInfo.email } })
+        .then(queryRes => {
+          var userExists = true
+          if (!queryRes) {
+            User.create({
+              name: userInfo.name,
+              email: userInfo.email
+            })
+            userExists = false
+          }
+          res.redirect(`${process.env.APP_URL}/login?token=${authHelper.generateJwt(userInfo.email)}&exists=${userExists}`)
+        })
+        .catch(err => {
+          res.status(500).send({
+            message:
+              err.message || "Some error occurred."
+          });
+        });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while getting the token."
+      });
+    });
 }
 
 exports.update = (req, res) => {
