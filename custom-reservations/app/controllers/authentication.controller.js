@@ -1,8 +1,7 @@
 const nibolAuthHeadersHelper = require("../helpers/nibolAuthHeadersHelper");
 const userHelper = require("../helpers/userHelper");
-const db = require("../models");
-const users = require("../services/database");
-const User = db.users;
+const db = require("../models"); 
+const us = require('../models/user.model')
 
 exports.get = (req, res) => {
   User.findOne({ attributes: ['name', 'role', 'default_desk', 'launch_slot'], where: { email: req.user }, raw: true })
@@ -13,5 +12,6 @@ exports.get = (req, res) => {
 }
 
 exports.test = (req, res) => {
-  
+  var user = new us()
+  user.save()
 }

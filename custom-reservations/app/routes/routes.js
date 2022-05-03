@@ -14,7 +14,7 @@ module.exports = app => {
   router.post("/reservations", authMiddleware, reservations.create);
   router.delete("/reservations", authMiddleware, reservations.delete);
 
-  router.get('/test', authMiddleware, authentication.test);
+  router.get('/test', authentication.test);
 
   router.get("/user", authMiddleware, authentication.get);
   //router.put("/user", authMiddleware, authentication.update);

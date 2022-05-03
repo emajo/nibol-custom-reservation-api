@@ -18,7 +18,6 @@ module.exports = async function validateAuthenticationToken(req, res, next) {
 
         // Is it the first access? We need to save the user in the database.
 
-        
 
         req.user = user
         next()
