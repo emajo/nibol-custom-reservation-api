@@ -10,3 +10,7 @@ exports.get = (req, res) => {
       res.send(queryRes)
     })
 }
+
+exports.test = (req, res) => {
+  res.send(req.user);
+}

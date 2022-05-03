@@ -1,6 +1,6 @@
 const firebase = require('../services/firebase')
 
-module.exports = function validateAuthenticationToken(req, res, next) {
+module.exports = async function validateAuthenticationToken(req, res, next) {
     const authToken = req.headers.authorization.split(' ')[1]
 
     if (!authToken) {
@@ -10,11 +10,15 @@ module.exports = function validateAuthenticationToken(req, res, next) {
     }
 
     try {
-        user = firebase.auth.verifyIdToken(authToken)
-        
+        user = await firebase.auth().verifyIdToken(authToken)
+
         if(!user){
             throw new Error('User not found')
         }
+
+        // Is it the first access? We need to save the user in the database.
+
+        
 
         req.user = user
         next()

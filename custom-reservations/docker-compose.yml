@@ -1,22 +1,12 @@
 version: '3.8'
 
 services:
-  mysqldb:
-    image: arm64v8/mysql:oracle
-    restart: always
-    env_file: ./.env
-    environment:
-      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-      - MYSQL_DATABASE=$MYSQLDB_DATABASE
-    ports:
-      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
-    volumes:
-      - db:/var/lib/mysql
   app:
+    container_name: cr-backend
     image: custom_reservations/node:latest
-    depends_on:
-      - mysqldb
     restart: always
+    depends_on:
+      - cr-firebase-tools
     env_file: ./.env
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
@@ -24,16 +14,34 @@ services:
     volumes:
       - .:/app
     environment:
-      - DB_HOST=mysqldb
-      - DB_USER=$MYSQLDB_USER
-      - DB_PASSWORD=$MYSQLDB_ROOT_PASSWORD
-      - DB_NAME=$MYSQLDB_DATABASE
-      - DB_PORT=$MYSQLDB_DOCKER_PORT
-      - FIC_CLIENT_ID=$FIC_CLIENT_ID
-      - FIC_CLIENT_SECRET=$FIC_CLIENT_SECRET
       - URL=$URL
+      - FIRESTORE_EMULATOR_HOST=cr-firebase-tools:8080
     stdin_open: true
     tty: true
+    networks:
+      backend:
+        aliases:
+          - cr-backend
 
-volumes: 
-  db:
+  firebase-tools:
+    container_name: cr-firebase-tools
+    image: spine3/firebase-emulator
+    ports:
+      - 9000:9000
+      - 8080:8080
+      - 4000:4000
+      - 9099:9099
+      - 8085:8085
+      - 5001:5001
+      - 9199:9199
+    environment:
+      - GCP_PROJECT=$GCP_PROJECT
+      - ENABLE_UI=true
+    networks:
+      backend:
+        aliases:
+          - cr-firebase-tools
+
+networks:
+  backend:
+    name: cr-network
