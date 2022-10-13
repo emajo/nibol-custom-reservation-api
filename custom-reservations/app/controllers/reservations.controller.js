@@ -19,6 +19,14 @@ const spaces = {
 exports.list = async (req, res) => {
 
   try {
+
+    var spaces = {
+      'Open Space Developers': 'dev',
+      'Open Space Customer Support': 'cs',
+      'Postazioni fisse': 'fix',
+      'Sala Mensa ': 'mensa'
+    }
+
     axios.get(`${process.env.NIBOL_URL}/reservation/calendar`, await nibolAuthHeadersHelper(req.user))
       .then(r => {
         var days = []
@@ -32,7 +40,8 @@ exports.list = async (req, res) => {
               id: reservation.id,
               start: reservation.start,
               end: reservation.end,
-              space: spaces[reservation.space.name]
+              space: reservation.space.name,
+              space_short: spaces[reservation.space.name],
             }
 
             var day = rv.start.split('T')[0]

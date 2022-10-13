@@ -3,7 +3,7 @@ module.exports = app => {
   const reservations = require("../controllers/reservations.controller.js");
   const authentication = require("../controllers/authentication.controller.js");
   const nibolAuthentication = require("../controllers/nibolAuthentication.controller.js");
-  const authMiddleware = require("../middleware/auth.middleware.js");
+  const authMiddleware = require("../middleware/firebase-auth.middleware.js");
 
   var router = require("express").Router();
 
@@ -14,11 +14,10 @@ module.exports = app => {
   router.post("/reservations", authMiddleware, reservations.create);
   router.delete("/reservations", authMiddleware, reservations.delete);
 
-  router.get("/login", authentication.login);
-  router.get("/auth", authentication.auth);
+  router.get('/test', authentication.test);
 
   router.get("/user", authMiddleware, authentication.get);
-  router.put("/user", authMiddleware, authentication.update);
+  //router.put("/user", authMiddleware, authentication.update);
 
   router.post("/nibol_token", authMiddleware, nibolAuthentication.setNibolToken);
   router.post("/nibol_pass", authMiddleware, nibolAuthentication.retireveNibolTokenFromPassword);

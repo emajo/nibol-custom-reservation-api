@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: cr-backend
+    image: custom_reservations/node:latest
+    restart: always
+    depends_on:
+      - cr-firebase-tools
+    env_file: ./.env
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+      - 9229:9229
+    volumes:
+      - .:/app
+    environment:
+      - URL=$URL
+      - FIRESTORE_EMULATOR_HOST=cr-firebase-tools:8080
+    stdin_open: true
+    tty: true
+    networks:
+      backend:
+        aliases:
+          - cr-backend
+
+  firebase-tools:
+    container_name: cr-firebase-tools
+    image: spine3/firebase-emulator
+    ports:
+      - 9000:9000
+      - 8080:8080
+      - 4000:4000
+      - 9099:9099
+      - 8085:8085
+      - 5001:5001
+      - 9199:9199
+    environment:
+      - GCP_PROJECT=$GCP_PROJECT
+      - ENABLE_UI=true
+    networks:
+      backend:
+        aliases:
+          - cr-firebase-tools
+
+networks:
+  backend:
+    name: cr-network
